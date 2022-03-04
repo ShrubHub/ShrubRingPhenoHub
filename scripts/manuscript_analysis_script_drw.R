@@ -1064,7 +1064,7 @@ tsummerplot <- ggplot() +
                   alpha = 0.2, linetype = 0, fill = "#ce0000") +
   geom_line(data = tsummerpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1) +
   geom_point(data = DendroClimAIC, aes(x = tsummer, y = drw), colour = "#ce0000", alpha = 0.5, size = 2) +
-  labs(x = "\nSummer Temperature (˚C)", y = "Relative growth\n") +
+  labs(x = "\nSummer Temperature (\u00B0C)", y = "Relative growth\n") +
   theme_JB()
 
 tautumnplot_data <- DendroClimAIC %>%
@@ -1075,7 +1075,7 @@ tautumnplot <- ggplot() +
                   alpha = 0.2, linetype = 0, fill = "#ce0000") +
   geom_line(data = tautumnpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1) +
   geom_point(data = DendroClimAIC, aes(x = tautumn, y = drw), colour = "#ce0000", alpha = 0.5, size = 2) +
-  labs(x = "\nAutumn Temperature (˚C)", y = "Relative growth\n") +
+  labs(x = "\nAutumn Temperature (\u00B0C)", y = "Relative growth\n") +
   theme_JB()
 
 PhenologyGrowthModels <- grid.arrange(P2plot, P5plot, pPxplot, Pxplot, tsummerplot, tautumnplot)
