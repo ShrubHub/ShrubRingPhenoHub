@@ -969,9 +969,22 @@ models1Sc_Bayes <- DendroClimAICScLong %>%
   )$fixed[2,])) %>% group_by(Variable) %>%
   unnest_wider(col = c(estimate)) %>% rename("Est_error" = 'Est.Error', "CI_low" = `l-95% CI`, "CI_high" = `u-95% CI`) 
   
-models1Sc_Bayes <- models1Sc_Bayes %>% mutate(Variable_full = recode(Variable, "P1" = "Snow melt", "P2" = "Leaf emergence", "P5" = "Leaf senescence", "pPx" = "Prev. GSL", "Px" = "GSL", "ptsummer" = "Prev. temp. summer", "ptautumn" = "Prev. temp. autumn", "twinter" = "Winter temp.", "tspring" = "Spring temp.", "tsummer" = "Summer temp.", "tautumn" = "Autumn temp.", "ppsummer" = "Prev. summer precip.", "ppautumn" = "Prev. autumn precip.", "pwinter" = "Winter precip.", "pspring" = "Spring precip.", "psummer" = "Summer precip.", "pautumn" = "Autumn precip.", "NDVImodis" = "MODIS max. NDVI", "min.extent" = "Sea ice min. extent", "onset.melt" = "Sea ice melt onset"), Variable_type = recode(Variable, "P1" = "ice", "P2" = "pheno", "P5" = "pheno", "pPx" = "pheno", "Px" = "pheno", "ptsummer" = "temp", "ptautumn" = "temp", "twinter" = "temp", "tspring" = "temp", "tsummer" = "temp", "tautumn" = "temp", "ppsummer" = "precip", "ppautumn" = "precip", "pwinter" = "precip", "pspring" = "precip", "psummer" = "precip", "pautumn" = "precip", "NDVImodis" = "ndvi", "min.extent" = "ice", "onset.melt" = "ice")) 
+models1Sc_Bayes_rand <- DendroClimAICScLong %>%
+  group_by(Variable) %>%
+  do(estimate = unlist(summary(
+    brm(darea ~ (Value) + (1 | Year), data = ., warmup = 1000, 
+        iter = 3000, cores = 2, chains = 2)
+    #control = list(adapt_delta = 0.95)
+  )$random[[1]])) %>% group_by(Variable) %>%
+  unnest_wider(col = c(estimate)) %>% rename("Est_error" = 'Est.Error', "CI_low" = `l-95% CI`, "CI_high" = `u-95% CI`) 
 
-write.csv(models1Sc_Bayes, file = "outputs/Bayesian_results_table_drw.csv")
+models1Sc_Bayes_rand <- models1Sc_Bayes_rand %>% 
+  mutate(type = "random") %>%
+  unite("Variable", c(type,Variable), remove = FALSE) %>% dplyr::select(-type)
+
+models1Sc_Bayes_all <- models1Sc_Bayes %>% rbind(models1Sc_Bayes_rand) %>% mutate(Variable_full = recode(Variable, "P1" = "Snow melt", "P2" = "Leaf emergence", "P5" = "Leaf senescence", "pPx" = "Prev. GSL", "Px" = "GSL", "ptsummer" = "Prev. temp. summer", "ptautumn" = "Prev. temp. autumn", "twinter" = "Winter temp.", "tspring" = "Spring temp.", "tsummer" = "Summer temp.", "tautumn" = "Autumn temp.", "ppsummer" = "Prev. summer precip.", "ppautumn" = "Prev. autumn precip.", "pwinter" = "Winter precip.", "pspring" = "Spring precip.", "psummer" = "Summer precip.", "pautumn" = "Autumn precip.", "NDVImodis" = "MODIS max. NDVI", "min.extent" = "Sea ice min. extent", "onset.melt" = "Sea ice melt onset", "random_P1" = "random_Snow melt", "random_P2" = "random_Leaf emergence", "random_P5" = "random_Leaf senescence", "random_pPx" = "random_Prev. GSL", "random_Px" = "random_GSL", "random_ptsummer" = "random_Prev. temp. summer", "random_ptautumn" = "random_Prev. temp. autumn", "random_twinter" = "random_Winter temp.", "random_tspring" = "random_Spring temp.", "random_tsummer" = "random_Summer temp.", "random_tautumn" = "random_Autumn temp.", "random_ppsummer" = "random_Prev. summer precip.", "random_ppautumn" = "random_Prev. autumn precip.", "random_pwinter" = "random_Winter precip.", "random_pspring" = "random_Spring precip.", "random_psummer" = "random_Summer precip.", "random_pautumn" = "random_Autumn precip.", "random_NDVImodis" = "random_MODIS max. NDVI", "random_min.extent" = "random_Sea ice min. extent", "random_onset.melt" = "random_Sea ice melt onset"), Variable_type = recode(Variable, "P1" = "ice", "P2" = "pheno", "P5" = "pheno", "pPx" = "pheno", "Px" = "pheno", "ptsummer" = "temp", "ptautumn" = "temp", "twinter" = "temp", "tspring" = "temp", "tsummer" = "temp", "tautumn" = "temp", "ppsummer" = "precip", "ppautumn" = "precip", "pwinter" = "precip", "pspring" = "precip", "psummer" = "precip", "pautumn" = "precip", "NDVImodis" = "ndvi", "min.extent" = "ice", "onset.melt" = "ice"))
+
+write.csv(models1Sc_Bayes_all, file = "outputs/Bayesian_results_table_drw.csv")
 
 # Figure S6 Growth Models ----
 P2model <- brm(drw ~ P2 + (1 | Year),  
@@ -1018,7 +1031,7 @@ P2plot_data <- DendroClimAIC %>%
 P2plot <- ggplot() +
   stat_lineribbon(data = P2plot_data, aes(x = P2, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#7200a3") +
-  geom_line(data = P2predict, aes(x = x, y = predicted), colour = "#7200a3", size = 1) +
+  geom_line(data = P2predict, aes(x = x, y = predicted), colour = "#7200a3", size = 1, linetype = 2) +
   geom_point(data = DendroClimAIC, aes(x = P2, y = drw), colour = "#7200a3", alpha = 0.5, size = 2) +
   labs(x = "\nLeaf emergence (DOY)", y = "Relative growth\n") +
   theme_JB()
@@ -1029,7 +1042,7 @@ P5plot_data <- DendroClimAIC %>%
 P5plot <- ggplot() +
   stat_lineribbon(data = P5plot_data, aes(x = P5, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#7200a3") +
-  geom_line(data = P5predict, aes(x = x, y = predicted), colour = "#7200a3", size = 1) +
+  geom_line(data = P5predict, aes(x = x, y = predicted), colour = "#7200a3", size = 1, linetype = 2) +
   geom_point(data = DendroClimAIC, aes(x = P5, y = drw), colour = "#7200a3", alpha = 0.5, size = 2) +
   labs(x = "\nLeaf senescence (DOY)", y = "Relative growth\n") +
   theme_JB()
@@ -1040,7 +1053,7 @@ pPxplot_data <- DendroClimAIC %>%
 pPxplot <- ggplot() +
   stat_lineribbon(data = pPxplot_data, aes(x = pPx, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#7200a3") +
-  geom_line(data = pPxpredict, aes(x = x, y = predicted), colour = "#7200a3", size = 1) +
+  geom_line(data = pPxpredict, aes(x = x, y = predicted), colour = "#7200a3", size = 1, linetype = 2) +
   geom_point(data = DendroClimAIC, aes(x = pPx, y = drw), colour = "#7200a3", alpha = 0.5, size = 2) +
   labs(x = "\nPrev. Growing Season Length (days)", y = "Relative growth\n") +
   theme_JB()
@@ -1051,7 +1064,7 @@ Pxplot_data <- DendroClimAIC %>%
 Pxplot <- ggplot() +
   stat_lineribbon(data = Pxplot_data, aes(x = Px, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#7200a3") +
-  geom_line(data = Pxpredict, aes(x = x, y = predicted), colour = "#7200a3", size = 1) +
+  geom_line(data = Pxpredict, aes(x = x, y = predicted), colour = "#7200a3", size = 1, linetype = 2) +
   geom_point(data = DendroClimAIC, aes(x = Px, y = drw), colour = "#7200a3", alpha = 0.5, size = 2) +
   labs(x = "\nGrowing Season Length (days)", y = "Relative growth\n") +
   theme_JB()
@@ -1062,7 +1075,7 @@ tsummerplot_data <- DendroClimAIC %>%
 tsummerplot <- ggplot() +
   stat_lineribbon(data = tsummerplot_data, aes(x = tsummer, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#ce0000") +
-  geom_line(data = tsummerpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1) +
+  geom_line(data = tsummerpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1, linetype = 2) +
   geom_point(data = DendroClimAIC, aes(x = tsummer, y = drw), colour = "#ce0000", alpha = 0.5, size = 2) +
   labs(x = "\nSummer Temperature (\u00B0C)", y = "Relative growth\n") +
   theme_JB()
@@ -1073,7 +1086,7 @@ tautumnplot_data <- DendroClimAIC %>%
 tautumnplot <- ggplot() +
   stat_lineribbon(data = tautumnplot_data, aes(x = tautumn, y = .prediction), .width = c(.95, .80, .50),
                   alpha = 0.2, linetype = 0, fill = "#ce0000") +
-  geom_line(data = tautumnpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1) +
+  geom_line(data = tautumnpredict, aes(x = x, y = predicted), colour = "#ce0000", size = 1, linetype = 1) +
   geom_point(data = DendroClimAIC, aes(x = tautumn, y = drw), colour = "#ce0000", alpha = 0.5, size = 2) +
   labs(x = "\nAutumn Temperature (\u00B0C)", y = "Relative growth\n") +
   theme_JB()
