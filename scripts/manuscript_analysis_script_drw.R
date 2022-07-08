@@ -1181,7 +1181,7 @@ cor.test(DendroClimAICSc$P5, DendroClimAICSc$tsummer)
 cor.test(DendroClimAICSc$ptautumn, DendroClimAICSc$tsummer)
 cor.test(DendroClimAICSc$ptautumn, DendroClimAICSc$P5)
 
-corr_data <- DendroClimAICSc %>% dplyr::select(-Year, -Plot, -Individual, -count, -drw, -rw, -area, -darea) %>% distinct() %>% rename("Snow melt" = P1, "Leaf emergence" = P2, "Leaf senescence" = P5, "Prev. GSL" = pPx, GSL = Px, "Prev. temp. summer" = ptsummer, "Prev. temp. autumn" = ptautumn, "Winter temp." = twinter, "Spring temp." = tspring, "Summer temp." = tsummer, "Autumn temp." = tautumn, "Prev. summer precip." = ppsummer, "Prev. autumn precip." = ppautumn, "Winter precip." = pwinter, "Spring precip." = pspring, "Winter precip." = pwinter, "Summer precip." = psummer, "Autumn precip." = pautumn, "MODIS max. NDVI" = NDVImodis, "Sea ice min. extent" = min.extent, "Sea ice melt onset" = onset.melt)
+corr_data <- DendroClimAICSc %>% dplyr::select(-Year, -Plot, -Individual, -count, -drw, -rw, -area, -darea) %>% distinct() %>% rename("Snow melt" = P1, "Leaf emergence" = P2, "Leaf senescence" = P5, "Prev. GSL" = pPx, GSL = Px, "Prev. summer temp." = ptsummer, "Prev. autumn temp." = ptautumn, "Winter temp." = twinter, "Spring temp." = tspring, "Summer temp." = tsummer, "Autumn temp." = tautumn, "Prev. summer precip." = ppsummer, "Prev. autumn precip." = ppautumn, "Winter precip." = pwinter, "Spring precip." = pspring, "Winter precip." = pwinter, "Summer precip." = psummer, "Autumn precip." = pautumn, "MODIS max. NDVI" = NDVImodis, "Sea ice min. extent" = min.extent, "Sea ice melt onset" = onset.melt)
 
 corr_mat <- cor(corr_data, use = "all.obs")
 
