@@ -279,12 +279,12 @@ SDall_nolegend <- SDall + theme(legend.position = "none")
 SDused_nolegend <- SDused + theme(legend.position = "none")
 SDlegend <- legend(SDall)
 SDmulti <- grid.arrange(arrangeGrob(SDall_nolegend, SDused_nolegend, ncol = 1),
-             SDlegend, nrow = 1)
+                        SDlegend, nrow = 1)
 ggsave(plot = SDmulti,
-  "figures/FigS2_SampleDepth.pdf",
-  width = 20,
-  height = 20,
-  units = "cm"
+       "figures/ESM1B_SampleDepth.pdf",
+       width = 20,
+       height = 20,
+       units = "cm"
 )
 
 # Detrending rw
@@ -657,7 +657,7 @@ for (i in 1:length(AIC_var)) {
   results[i + 1, 5] <- anova(AIC_model, AIC_null) [2, 6]
   modelplot <-
     ggplot(AIC_model, aes(Value, area)) + geom_point() +  geom_smooth(method =
-                                                                       lm) +
+                                                                        lm) +
     theme_JB() + labs(x = var_names[i])
   diagplot <-
     ggplot(AIC_model, aes(.fitted, .resid))  + geom_point() +
@@ -850,7 +850,7 @@ psummercorplot <-
   geom_hline(aes(yintercept = 0)) + geom_hline(aes(yintercept = 0.145),
                                                colour = "#000099",
                                                linetype = 2) +
- labs(title = "Summer precip.", x = "", y = "") + geom_segment(mapping = aes(xend = lag, yend = 0)) + theme_JB()
+  labs(title = "Summer precip.", x = "", y = "") + geom_segment(mapping = aes(xend = lag, yend = 0)) + theme_JB()
 pautumnAIC_modelREML <-
   lmer(drw ~ pautumn + (1 | Year), data = DendroClimAICSc, REML = TRUE)
 pautumnautocor <- acf(residuals(pautumnAIC_modelREML), plot = FALSE)
@@ -860,7 +860,7 @@ pautumncorplot <-
   geom_hline(aes(yintercept = 0)) + geom_hline(aes(yintercept = 0.145),
                                                colour = "#000099",
                                                linetype = 2) +
-    labs(title = "Autumn precip.", x = "", y = "") + geom_segment(mapping = aes(xend = lag, yend = 0)) + theme_JB()
+  labs(title = "Autumn precip.", x = "", y = "") + geom_segment(mapping = aes(xend = lag, yend = 0)) + theme_JB()
 NDVImodisAIC_modelREML <-
   lmer(drw ~ NDVImodis + (1 |
                             Year), data = DendroClimAICSc, REML = TRUE)
@@ -922,7 +922,7 @@ overallautocor <-
     P1corplot
   )
 ggsave(
-  "figures/FigS5_Autocorrelation_drw.pdf",
+  "figures/ESM3A_Autocorrelation_drw.pdf",
   plot = overallautocor,
   width = 40,
   height = 40,
@@ -968,7 +968,7 @@ models1Sc_Bayes <- DendroClimAICScLong %>%
     #control = list(adapt_delta = 0.95)
   )$fixed[2,])) %>% group_by(Variable) %>%
   unnest_wider(col = c(estimate)) %>% rename("Est_error" = 'Est.Error', "CI_low" = `l-95% CI`, "CI_high" = `u-95% CI`) 
-  
+
 models1Sc_Bayes_rand <- DendroClimAICScLong %>%
   group_by(Variable) %>%
   do(estimate = unlist(summary(
@@ -988,9 +988,9 @@ write.csv(models1Sc_Bayes_all, file = "outputs/Bayesian_results_table_drw.csv")
 
 # Figure S6 Growth Models ----
 P2model <- brm(drw ~ P2 + (1 | Year),  
-              data = DendroClimAIC, 
-              warmup = 1000, iter = 3000, 
-              cores = 2, chains = 2)
+               data = DendroClimAIC, 
+               warmup = 1000, iter = 3000, 
+               cores = 2, chains = 2)
 
 P5model <- brm(drw ~ P5 + (1 | Year),  
                data = DendroClimAIC, 
@@ -1093,10 +1093,10 @@ tautumnplot <- ggplot() +
 
 PhenologyGrowthModels <- grid.arrange(P2plot, P5plot, pPxplot, Pxplot, tsummerplot, tautumnplot)
 ggsave(plot = PhenologyGrowthModels,
-  filename = "figures/FigS6_GrowthModels_drw.pdf",
-  width = 25,
-  height = 35,
-  units = "cm"
+       filename = "figures/ESM3B_GrowthModels_drw.pdf",
+       width = 25,
+       height = 35,
+       units = "cm"
 )
 
 # Figure S7 All Variables ----
@@ -1106,13 +1106,13 @@ models1Sc_Bayes$Estimate <- as.numeric(models1Sc_Bayes$Estimate)
 models1Sc_Bayes$CI_low <- as.numeric(models1Sc_Bayes$CI_low)
 models1Sc_Bayes$CI_high <- as.numeric(models1Sc_Bayes$CI_high)
 FigS7_AllVariables <- ggplot(models1Sc_Bayes,
-       aes(
-         colour = Variable_type,
-         fill = Variable_type,
-         x = Variable_full,
-         y = Estimate,
-         alpha = 0.5
-       )) +
+                             aes(
+                               colour = Variable_type,
+                               fill = Variable_type,
+                               x = Variable_full,
+                               y = Estimate,
+                               alpha = 0.5
+                             )) +
   geom_hline(yintercept = 0,
              alpha = 0.5,
              linetype = 3) +
@@ -1169,7 +1169,7 @@ FigS7_AllVariables <- ggplot(models1Sc_Bayes,
   scale_colour_manual(values = c("#65c0ed", "#F2AD00", "#7200a3", "#00A08A", "#ce0000"))
 
 ggsave(plot = FigS7_AllVariables, 
-       file = "figures/FigS7_AllVariables_drw.pdf",
+       file = "figures/ESM3C_AllVariables_drw.pdf",
        width = 20,
        height = 20,
        units = "cm"
